@@ -13,9 +13,41 @@ typeof ctx (Num _) = Just TNum
 typeof ctx (Add e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
                        (Just TNum, Just TNum) -> Just TNum 
                        _                      -> Nothing
+
+typeof ctx (Minus e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
+                       (Just TNum, Just TNum) -> Just TNum 
+                       _                      -> Nothing
+typeof ctx (Mul e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
+                       (Just TNum, Just TNum) -> Just TNum 
+                       _                      -> Nothing
+typeof ctx (Div e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
+                       (Just TNum, Just TNum) -> Just TNum 
+                       _                      -> Nothing
+typeof ctx (Not e1) = case (typeof ctx e1) of 
+                           (Just TBool) -> Just TBool 
+                           _                         -> Nothing
+
+typeof ctx (GreaterThan e1 e2) = case (typeof ctx e1, typeof ctx e2) of
+                        (Just TNum, Just TNum) -> Just TBool 
+                        _                      -> Nothing
+typeof ctx (LesserThan e1 e2) = case (typeof ctx e1, typeof ctx e2) of
+                        (Just TNum, Just TNum) -> Just TBool 
+                        _                      -> Nothing
+              
+
 typeof ctx (And e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
                        (Just TBool, Just TBool) -> Just TBool 
                        _                        -> Nothing
+
+typeof ctx (Or e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
+                       (Just TBool, Just TBool) -> Just TBool 
+                       _                        -> Nothing
+
+typeof ctx (Equals e1 e2) = case (typeof ctx e1, typeof ctx e2) of
+                            (Just TBool, Just TBool) -> Just TBool
+                            (Just TNum, Just TNum)   -> Just TBool
+                            _                        -> Nothing
+
 typeof ctx (If e1 e2 e3) = case typeof ctx e1 of 
                          Just TBool -> case (typeof ctx e2, typeof ctx e3) of
                                          (Just t1, Just t2)       -> if (t1 == t2) then

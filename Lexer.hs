@@ -7,13 +7,21 @@ data Expr = BTrue
           | Num Int 
           | Add Expr Expr 
           | And Expr Expr 
+          | Or Expr Expr
+          | Minus Expr Expr
+          | Mul Expr Expr
+          | GreaterThan Expr Expr
+          | LesserThan Expr Expr
+          | Not Expr
+          | Div Expr Expr
+          | Equals Expr Expr
           | If Expr Expr Expr 
           | Var String
           | Lam String Ty Expr 
           | App Expr Expr
           | Paren Expr
           | Let String Expr Expr 
-          deriving Show
+          deriving (Show, Eq)
 
 data Ty = TBool 
         | TNum 
@@ -24,7 +32,15 @@ data Token = TokenTrue
            | TokenFalse 
            | TokenNum Int 
            | TokenAdd
-           | TokenAnd 
+           | TokenMinus
+           | TokenAnd
+           | TokenMul
+           | TokenGreaterThan
+           | TokenLesserThan
+           | TokenNot
+           | TokenDiv
+           | TokenOr
+           | TokenEquals
            | TokenIf 
            | TokenThen 
            | TokenElse
@@ -42,7 +58,7 @@ data Token = TokenTrue
            deriving (Show, Eq)
 
 isSymb :: Char -> Bool 
-isSymb c = c `elem` "+&\\->()=:"
+isSymb c = c `elem` "/!<*|-+&\\->()=:"
 
 lexer :: String -> [Token]
 lexer [] = [] 
@@ -61,10 +77,18 @@ lexNum cs = case span isDigit cs of
 lexSymbol :: String -> [Token]
 lexSymbol cs = case span isSymb cs of 
                  ("+", rest)  -> TokenAdd : lexer rest 
+                 ("-", rest)  -> TokenMinus : lexer rest
+                 ("*", rest)  -> TokenMul : lexer rest
+                 ("/", rest)  -> TokenDiv : lexer rest
+                 ("!", rest)  -> TokenNot : lexer rest
+                 ("<", rest)  -> TokenLesserThan : lexer rest
+                 (">", rest)  -> TokenGreaterThan : lexer rest
+                 ("||", rest) -> TokenOr : lexer rest 
                  ("&&", rest) -> TokenAnd : lexer rest 
+                 ("=", rest)  -> TokenEq : lexer rest 
+                 ("==", rest) -> TokenEquals : lexer rest 
                  ("\\", rest) -> TokenLam : lexer rest 
                  ("->", rest) -> TokenArrow : lexer rest 
-                 ("=", rest)  -> TokenEq : lexer rest 
                  (":", rest)  -> TokenColon : lexer rest 
                  _ -> error "Lexical error: invalid symbol!"
 
