@@ -5,6 +5,7 @@ import Data.Char
 data Expr = BTrue
           | BFalse 
           | Num Int 
+          | Pair Expr Expr
           | Add Expr Expr 
           | And Expr Expr 
           | Or Expr Expr
@@ -26,6 +27,8 @@ data Expr = BTrue
 data Ty = TBool 
         | TNum 
         | TFun Ty Ty
+        | TBoolPair
+        | TNumPair
         deriving (Show, Eq)
 
 data Token = TokenTrue 
@@ -49,9 +52,13 @@ data Token = TokenTrue
            | TokenArrow
            | TokenLParen
            | TokenRParen
+           | TokenLBracket
+           | TokenRBracket
+           | TokenComma
            | TokenLet 
            | TokenEq 
            | TokenIn
+           | TokenPair
            | TokenColon
            | TokenBoolean 
            | TokenNumber
@@ -64,6 +71,9 @@ lexer :: String -> [Token]
 lexer [] = [] 
 lexer ('(':cs) = TokenLParen : lexer cs
 lexer (')':cs) = TokenRParen : lexer cs
+lexer ('{':cs) = TokenLBracket : lexer cs
+lexer ('}':cs) = TokenRBracket : lexer cs
+lexer (',':cs) = TokenComma : lexer cs
 lexer (c:cs) | isSpace c = lexer cs 
              | isDigit c = lexNum (c:cs)
              | isSymb c = lexSymbol (c:cs)

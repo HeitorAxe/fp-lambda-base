@@ -32,6 +32,9 @@ import Lexer
     "->"        { TokenArrow }
     '('         { TokenLParen }
     ')'         { TokenRParen }
+    '{'         { TokenLBracket }
+    '}'         { TokenRBracket }
+    ','         { TokenComma }
     '='         { TokenEq }
     let         { TokenLet }
     in          { TokenIn }
@@ -60,6 +63,7 @@ Exp         : num                           { Num $1 }
             | Exp Exp                       { App $1 $2 }
             | '(' Exp ')'                   { Paren $2 }
             | let var '=' Exp in Exp        { Let $2 $4 $6 }
+            | '{' Exp ',' Exp '}'           { Pair $2 $4 }
 
 Type    : Bool                              { TBool }
         | Num                               { TNum }

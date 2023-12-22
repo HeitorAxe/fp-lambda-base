@@ -7,6 +7,8 @@ isValue :: Expr -> Bool
 isValue BTrue = True 
 isValue BFalse = True
 isValue (Num _) = True 
+isValue (Pair e1 e2) = isValue e1 && isValue e2
+   
 isValue (Lam _ _ _) = True
 isValue _ = False 
 
@@ -15,6 +17,8 @@ subst x n (Var v) = if (x == v) then
                       n 
                     else 
                       (Var v)
+
+subst x n (Pair e1 e2) = Pair (subst x n e1) (subst x n e2) 
 subst x n (Equals e1 e2) = Equals(subst x n e1) (subst x n e2)
 subst x n (LesserThan e1 e2) = LesserThan (subst x n e1) (subst x n e2)
 subst x n (GreaterThan e1 e2) = GreaterThan (subst x n e1) (subst x n e2)
@@ -35,6 +39,11 @@ subst x n e = e
 
 step :: Expr -> Expr 
 
+--- Pair Step
+step (Pair e1 e2) | isValue e1 && isValue e2 = Pair e1 e2
+                  | isValue e1 = Pair e1 (step e2)
+                  | isValue e2 = Pair (step e1) e2
+
 --Equals
 step (Equals e1 e2) | e1 == e2 = BTrue
                     | otherwise = BFalse
@@ -50,18 +59,28 @@ step (GreaterThan (Num n1) (Num n2)) | n1 > n2 = BTrue
 --Aritimetica
 step (Add (Num n1) (Num n2)) = Num (n1 + n2)
 step (Add (Num n) e) = Add (Num n) (step e)
+step (Add (Pair n1 n2) (Pair e1 e2)) = Pair (step (Add n1 e1)) (step (Add n2 e2))
+step (Add (Pair n1 n2) e) = Add (Pair n1 n2) (step e)
 step (Add e1 e2) = Add (step e1) e2 
+
 
 step (Minus (Num n1) (Num n2)) = Num (n1 - n2)
 step (Minus (Num n) e) = Minus (Num n) (step e)
+step (Minus (Pair n1 n2) (Pair e1 e2)) = Pair (step (Minus n1 e1)) (step (Minus n2 e2))
+step (Minus (Pair n1 n2) e) = Minus (Pair n1 n2) (step e)
 step (Minus e1 e2) = Minus (step e1) e2
+
 
 step (Mul (Num n1) (Num n2)) = Num (n1 * n2)
 step (Mul (Num n) e) = Mul (Num n) (step e)
+step (Mul (Pair n1 n2) (Pair e1 e2)) = Pair (step (Mul n1 e1)) (step (Mul n2 e2))
+step (Mul (Pair n1 n2) e) = Mul (Pair n1 n2) (step e)
 step (Mul e1 e2) = Mul (step e1) e2
 
 step (Div (Num n1) (Num n2)) = Num (n1 `div` n2)
 step (Div (Num n) e) = Div (Num n) (step e)
+step (Div (Pair n1 n2) (Pair e1 e2)) = Pair (step (Div n1 e1)) (step (Div n2 e2))
+step (Div (Pair n1 n2) e) = Div (Pair n1 n2) (step e)
 step (Div e1 e2) = Div (step e1) e2
 
 

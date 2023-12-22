@@ -10,18 +10,29 @@ typeof :: Ctx -> Expr -> Maybe Ty
 typeof ctx BTrue = Just TBool 
 typeof ctx BFalse = Just TBool 
 typeof ctx (Num _) = Just TNum 
+
+
+typeof ctx (Pair e1 e2) = case (typeof ctx e1, typeof ctx e2) of
+                              (Just TBool, Just TBool) -> Just TBoolPair
+                              (Just TNum, Just TNum) -> Just TNumPair
+                              _                -> Nothing
+
 typeof ctx (Add e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
                        (Just TNum, Just TNum) -> Just TNum 
-                       _                      -> Nothing
+                       (Just TNumPair, Just TNumPair) -> Just TNumPair 
+                       _                      -> Nothing 
 
 typeof ctx (Minus e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
                        (Just TNum, Just TNum) -> Just TNum 
+                       (Just TNumPair, Just TNumPair) -> Just TNumPair 
                        _                      -> Nothing
 typeof ctx (Mul e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
-                       (Just TNum, Just TNum) -> Just TNum 
+                       (Just TNum, Just TNum) -> Just TNum
+                       (Just TNumPair, Just TNumPair) -> Just TNumPair  
                        _                      -> Nothing
 typeof ctx (Div e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
-                       (Just TNum, Just TNum) -> Just TNum 
+                       (Just TNum, Just TNum) -> Just TNum
+                       (Just TNumPair, Just TNumPair) -> Just TNumPair  
                        _                      -> Nothing
 typeof ctx (Not e1) = case (typeof ctx e1) of 
                            (Just TBool) -> Just TBool 
@@ -71,6 +82,9 @@ typeof ctx (App e1 e2) = case (typeof ctx e1, typeof ctx e2) of
 typeof ctx (Let v e1 e2) = case typeof ctx e1 of 
                              Just t1 -> typeof ((v, t1):ctx) e2 
                              _       -> Nothing 
+
+
+
 
 typecheck :: Expr -> Expr 
 typecheck e = case typeof [] e of 
