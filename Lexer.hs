@@ -52,7 +52,7 @@ data Token = TokenTrue
            | TokenArrow
            | TokenLParen
            | TokenRParen
-           | TokenLBracket
+           | TokenLBracket 
            | TokenRBracket
            | TokenComma
            | TokenLet 

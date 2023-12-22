@@ -43,6 +43,7 @@ step :: Expr -> Expr
 step (Pair e1 e2) | isValue e1 && isValue e2 = Pair e1 e2
                   | isValue e1 = Pair e1 (step e2)
                   | isValue e2 = Pair (step e1) e2
+                  | otherwise = Pair (step e1) e2
 
 --Equals
 step (Equals e1 e2) | e1 == e2 = BTrue
